@@ -2,6 +2,10 @@ import graph;
 
 size(12cm, 12cm);
 
+// --- Color scheme
+pen fg = white;
+pen bg = black;
+
 // --- Data points
 // Class 1: open circles with "1" — mostly left, one crossover right
 pair[] class1 = {
@@ -39,11 +43,11 @@ real legY         = 5.5;   // legend top y position
 real legStep      = 0.75;  // vertical spacing between legend entries
 real legTextGap   = 0.1;   // gap between legend symbol and text
 
-pen ptborder  = black + linewidth(1pt);
-pen nnring    = black + linewidth(1.8pt);
-pen dotpen    = black + dotted + linewidth(0.6pt);
-pen encpen    = black + linewidth(0.7pt) + linetype("4 3");
-pen querypen  = black + linewidth(1.2pt);
+pen ptborder = fg + linewidth(1pt);
+pen nnring   = fg + linewidth(1.8pt);
+pen dotpen   = fg + dotted + linewidth(0.6pt);
+pen encpen   = fg + linewidth(0.7pt) + linetype("4 3");
+pen querypen = fg + linewidth(1.2pt);
 
 // --- Helper functions
 path diamond(pair center, real half) {
@@ -52,20 +56,20 @@ path diamond(pair center, real half) {
 }
 
 void drawQueryPoint(pair center, real half) {
-    filldraw(diamond(center, half), white, querypen);
-    label("$?$", center);
+    filldraw(diamond(center, half), bg, querypen);
+    label("$?$", center, fg);
 }
 
 // --- Axes
-draw((0,0)--(axisMax,0), Arrow(6));
-draw((0,0)--(0,yMax), Arrow(6));
-label("$x_1$", (axisMax, 0), E);
-label("$x_2$", (0, yMax), N);
+draw((0,0)--(axisMax,0), fg, Arrow(6));
+draw((0,0)--(0,yMax), fg, Arrow(6));
+label("$x_1$", (axisMax, 0), E, fg);
+label("$x_2$", (0, yMax), N, fg);
 
 for (int i = 1; i <= floor(axisMax); ++i)
-    draw((i,-tickLen)--(i,tickLen));
+    draw((i,-tickLen)--(i,tickLen), fg);
 for (int j = 1; j <= floor(yMax); ++j)
-    draw((-tickLen,j)--(tickLen,j));
+    draw((-tickLen,j)--(tickLen,j), fg);
 
 // --- Dotted lines from query to 3-NN
 for (pair p : nn)
@@ -77,16 +81,16 @@ for (pair p : nn)
     enc = max(enc, length(query - p));
 draw(circle(query, enc * encScale), encpen);
 
-// --- Class 1 points: open circles, black "1"
+// --- Class 1 points: bg-filled circles (appear open), white "1"
 for (pair p : class1) {
-    filldraw(circle(p, r), white, ptborder);
-    label("$1$", p);
+    filldraw(circle(p, r), bg, ptborder);
+    label("$1$", p, fg);
 }
 
-// --- Class 2 points: filled circles, white "2"
+// --- Class 2 points: fg-filled circles (appear solid), black "2"
 for (pair p : class2) {
-    filldraw(circle(p, r), black, ptborder);
-    label("$2$", p, white);
+    filldraw(circle(p, r), fg, ptborder);
+    label("$2$", p, bg);
 }
 
 // --- Highlight rings around 3-NN
@@ -102,14 +106,15 @@ pair leg2pos = leg1pos + (0, -legStep);
 pair leg3pos = leg2pos + (0, -legStep);
 real legDiamondHalf = r * diamondScale;
 
-filldraw(circle(leg1pos, r), white, ptborder);
-label("$1$", leg1pos);
-label("class 1", leg1pos + (r + legTextGap, 0), E);
+filldraw(circle(leg1pos, r), bg, ptborder);
+label("$1$", leg1pos, fg);
+label("class 1", leg1pos + (r + legTextGap, 0), E, fg);
 
-filldraw(circle(leg2pos, r), black, ptborder);
-label("$2$", leg2pos, white);
-label("class 2", leg2pos + (r + legTextGap, 0), E);
+filldraw(circle(leg2pos, r), fg, ptborder);
+label("$2$", leg2pos, bg);
+label("class 2", leg2pos + (r + legTextGap, 0), E, fg);
 
 drawQueryPoint(leg3pos, legDiamondHalf);
-label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E);
+label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E, fg);
 
+shipout(bbox(3mm, Fill(bg)));
