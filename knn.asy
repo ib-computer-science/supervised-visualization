@@ -3,18 +3,18 @@ import graph;
 size(12cm, 12cm);
 
 // --- Data points
-// Class 1: open circles with "1"
+// Class 1: open circles with "1" — mostly left, one crossover right
 pair[] class1 = {
     (1.2, 1.5), (2.0, 3.1), (0.8, 4.2), (1.7, 2.3),
     (3.1, 1.1), (0.5, 2.8), (2.5, 4.5), (1.0, 6.0),
-    (3.8, 3.5), (4.2, 5.1)
+    (3.8, 3.5), (6.5, 6.0)
 };
 
-// Class 2: filled circles with "2" (white text)
+// Class 2: filled circles with "2" — mostly right, two crossovers left
 pair[] class2 = {
     (5.5, 2.0), (6.8, 3.5), (7.2, 1.5), (5.0, 4.8),
     (6.1, 5.5), (7.5, 4.2), (8.0, 2.8), (5.8, 6.2),
-    (7.0, 6.5), (8.3, 5.0)
+    (2.5, 5.5), (3.5, 2.5)
 };
 
 // Query point
@@ -23,8 +23,8 @@ pair query = (4.8, 3.2);
 // 3 nearest neighbours (sorted by distance to query):
 //   class1[8] = (3.8, 3.5)  dist ≈ 1.04
 //   class2[0] = (5.5, 2.0)  dist ≈ 1.39
-//   class2[3] = (5.0, 4.8)  dist ≈ 1.61
-pair[] nn = {class1[8], class2[0], class2[3]};
+//   class2[9] = (3.5, 2.5)  dist ≈ 1.48
+pair[] nn = {class1[8], class2[0], class2[9]};
 
 // --- Style constants
 real r            = 0.22;  // point radius
@@ -104,14 +104,12 @@ real legDiamondHalf = r * diamondScale;
 
 filldraw(circle(leg1pos, r), white, ptborder);
 label("$1$", leg1pos);
-label("Class 1", leg1pos + (r + legTextGap, 0), E);
+label("class 1", leg1pos + (r + legTextGap, 0), E);
 
 filldraw(circle(leg2pos, r), black, ptborder);
 label("$2$", leg2pos, white);
-label("Class 2", leg2pos + (r + legTextGap, 0), E);
+label("class 2", leg2pos + (r + legTextGap, 0), E);
 
 drawQueryPoint(leg3pos, legDiamondHalf);
-label("Query point", leg3pos + (legDiamondHalf + legTextGap, 0), E);
+label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E);
 
-// --- Title
-label("\textbf{3-Nearest Neighbours} ($k=3$)", (axisMax/2, yMax + 0.15), N, fontsize(13));
