@@ -32,7 +32,6 @@ pair[] nn = {class1[8], class2[0], class2[9]};
 real r            = 0.22;  // point radius
 real diamondScale = 1.4;   // diamond half-diagonal relative to r
 real ringGap      = 0.13;  // extra radius of highlight ring beyond point border
-real encScale     = 1.08;  // enclosing circle radius relative to farthest NN
 real axisMax      = 9;
 real yMax         = 7.5;
 int  xTicks       = 8;     // number of x-axis tick marks
@@ -89,7 +88,7 @@ for (pair p : nn)
 real enc = 0;
 for (pair p : nn)
     enc = max(enc, length(query - p));
-draw(circle(query, enc * encScale), dashpen);
+draw(circle(query, enc), dashpen);
 
 // --- Class points
 for (pair p : class1) drawClass1Point(p);
