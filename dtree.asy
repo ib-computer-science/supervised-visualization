@@ -36,9 +36,6 @@ pair[] class2 = {
     (5.5, 5.5), (7.5, 6.5)
 };
 
-// Query point (same as knn.asy for comparison)
-pair query = (4.8, 3.2);
-
 // --- Style constants
 real legX            = 10.3;  // legend anchor: right of plot area
 real legY            = 6.5;   // legend anchor: vertical centre
@@ -50,19 +47,7 @@ real fracLegGap      = 0.4;   // half-width of "$1/2$" label plus spacing
 pen regionpen = fg + fontsize(regionLabelSize);
 
 // --- Axes
-draw((0,0)--(axisMax,0), fg, Arrow(6));
-draw((0,0)--(0,yMax), fg, Arrow(6));
-label("$x_1$", (axisMax, 0), E, fg);
-label("$x_2$", (0, yMax), N, fg);
-
-for (int i = 1; i <= xTicks; ++i) {
-    draw((i,-tickLen)--(i,tickLen), fg);
-    label("$" + string(i) + "$", (i, -tickLen), S, fg);
-}
-for (int j = 1; j <= yTicks; ++j) {
-    draw((-tickLen,j)--(tickLen,j), fg);
-    label("$" + string(j) + "$", (-tickLen, j), W, fg);
-}
+drawAxes();
 
 // --- Decision boundaries
 draw((splitX, 0)--(splitX, yMax), querypen);
@@ -88,21 +73,7 @@ for (pair p : class2) drawClass2Point(p);
 drawQueryPoint(query, r * diamondScale);
 
 // --- Legend
-pair leg1pos = (legX, legY);
-pair leg2pos = leg1pos + (0, -legStep);
-pair leg3pos = leg2pos + (0, -legStep);
-pair leg4pos = leg3pos + (0, -legStep);
-real legDiamondHalf  = r * diamondScale;
-
-drawClass1Point(leg1pos);
-label("class 1", leg1pos + (r + legTextGap, 0), E, fg);
-
-drawClass2Point(leg2pos);
-label("class 2", leg2pos + (r + legTextGap, 0), E, fg);
-
-drawQueryPoint(leg3pos, legDiamondHalf);
-label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E, fg);
-
+pair leg4pos = drawBaseLegend((legX, legY));
 label("$1/2$", leg4pos, fg);
 label("predicted class", leg4pos + (fracLegGap, 0), E, fg);
 

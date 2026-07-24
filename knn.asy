@@ -15,9 +15,6 @@ pair[] class2 = {
     (2.5, 5.5), (3.5, 2.5)
 };
 
-// Query point
-pair query = (4.8, 3.2);
-
 // 3 nearest neighbours (sorted by distance to query):
 //   class1[8] = (3.8, 3.5)  dist ≈ 1.04
 //   class2[0] = (5.5, 2.0)  dist ≈ 1.39
@@ -34,19 +31,7 @@ pen dotpen  = fg + dotted + linewidth(0.6pt);   // NN distance lines
 pen dashpen = fg + linewidth(0.7pt) + linetype("4 3");  // enclosing circle
 
 // --- Axes
-draw((0,0)--(axisMax,0), fg, Arrow(6));
-draw((0,0)--(0,yMax), fg, Arrow(6));
-label("$x_1$", (axisMax, 0), E, fg);
-label("$x_2$", (0, yMax), N, fg);
-
-for (int i = 1; i <= xTicks; ++i) {
-    draw((i,-tickLen)--(i,tickLen), fg);
-    label("$" + string(i) + "$", (i, -tickLen), S, fg);
-}
-for (int j = 1; j <= yTicks; ++j) {
-    draw((-tickLen,j)--(tickLen,j), fg);
-    label("$" + string(j) + "$", (-tickLen, j), W, fg);
-}
+drawAxes();
 
 // --- Dotted lines from query to 3-NN
 for (pair p : nn)
@@ -70,18 +55,6 @@ for (pair p : nn)
 drawQueryPoint(query, r * diamondScale);
 
 // --- Legend
-pair leg1pos = (legX, legY);
-pair leg2pos = leg1pos + (0, -legStep);
-pair leg3pos = leg2pos + (0, -legStep);
-real legDiamondHalf = r * diamondScale;
-
-drawClass1Point(leg1pos);
-label("class 1", leg1pos + (r + legTextGap, 0), E, fg);
-
-drawClass2Point(leg2pos);
-label("class 2", leg2pos + (r + legTextGap, 0), E, fg);
-
-drawQueryPoint(leg3pos, legDiamondHalf);
-label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E, fg);
+drawBaseLegend((legX, legY));
 
 shipout(bbox(3mm, Fill(bg)));
