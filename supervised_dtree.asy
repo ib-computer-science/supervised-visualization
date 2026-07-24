@@ -1,4 +1,4 @@
-import common;
+import supervised_common;
 
 // --- Decision boundary splits
 real splitX  = 5.0;  // x1 split (vertical)
