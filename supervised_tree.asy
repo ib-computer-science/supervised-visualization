@@ -29,44 +29,48 @@ TreeNode leaf(int cls, string edgeLbl) {
 }
 
 // --- Style
-real ySep   = 2.4;   // vertical distance between levels
-real hStart = 2.5;   // initial horizontal offset (halves at each level)
-
-real nW    = 1.6;    // internal node half-width
-real nH    = 0.42;   // internal node half-height
-real treeR = 0.55;   // leaf circle radius (larger than scatter plot points)
-
-real lblOff = 0.32;  // horizontal nudge to keep edge labels off the edge line
+real ySep      = 2.4;   // vertical distance between levels
+real hStart    = 2.5;   // initial horizontal offset (halves at each level)
+real treeR     = r;     // leaf circle radius — same as scatter plot points; font scales to match internal node text
+real nodePad   = 0.15;  // padding around label text inside internal node boxes
+// IMPORTANT: unitScale must equal the unitsize() set in supervised_common.asy
+real unitScale = 1.3cm; // converts PostScript points (frame coords) to user units
+real lblOff    = 0.32;  // horizontal nudge to keep edge labels off the edge line
 
 pen nodepen = fg + linewidth(0.8pt);
 pen edgepen = fg + linewidth(0.7pt);
 
 // --- Drawing helpers
-path intBox(pair c) {
-    return (c+(-nW,-nH))--(c+(nW,-nH))--(c+(nW,nH))--(c+(-nW,nH))--cycle;
+
+// Return the half-extents (hw, hh) of an internal node box for the given label.
+pair nodeExtents(string cond) {
+    frame f;
+    label(f, cond);
+    pair sz = max(f) - min(f);
+    return (sz.x/(2*unitScale) + nodePad, sz.y/(2*unitScale) + nodePad);
 }
 
-void drawInternalNode(pair c, string cond) {
-    filldraw(intBox(c), bg, nodepen);
+// Draw an internal node box using pre-computed half-extents ext = (hw, hh).
+void drawInternalNode(pair c, string cond, pair ext) {
+    filldraw((c+(-ext.x,-ext.y))--(c+(ext.x,-ext.y))
+            --(c+(ext.x, ext.y))--(c+(-ext.x, ext.y))--cycle, bg, nodepen);
     label(cond, c, fg);
 }
 
-// Leaf style matches class point style from scatter plots, scaled up.
+// Leaf nodes use the same class point style as the scatter plots.
 void drawLeafNode(pair c, int cls) {
-    if (cls == 1) {
-        filldraw(circle(c, treeR), bg, nodepen);
-        label("$1$", c, fg);
-    } else {
-        filldraw(circle(c, treeR), fg, nodepen);
-        label("$2$", c, bg);
-    }
+    if (cls == 1) drawClass1Point(c, treeR, nodepen);
+    else          drawClass2Point(c, treeR, nodepen);
 }
 
-// Draw a directed edge from the bottom of an internal node at `from`
-// to the top of a child node at `to`, with a branch label.
-void drawEdge(pair parentPos, pair childPos, bool toLeaf, string lbl, bool leftBranch) {
-    pair start = parentPos + (0, -nH);
-    pair end   = childPos  + (0, toLeaf ? treeR : nH);
+// Draw a directed edge from the bottom of a parent node to the top of a child.
+// childHH is the upward offset from child centre to the edge endpoint:
+// treeR for leaf children, nodeExtents(...).y for internal children.
+void drawEdge(pair parentPos, real parentHH,
+              pair childPos,  real childHH,
+              string lbl, bool leftBranch) {
+    pair start = parentPos + (0, -parentHH);
+    pair end   = childPos  + (0,  childHH);
     draw(start--end, edgepen, Arrow(5));
     pair mid = (start + end) / 2;
     label(lbl, mid + ((leftBranch ? -lblOff : lblOff), 0), fg);
@@ -76,21 +80,24 @@ void drawEdge(pair parentPos, pair childPos, bool toLeaf, string lbl, bool leftB
 // `hOffset` is the horizontal distance from this node to each child;
 // it halves at every level, giving a balanced layout for a complete binary tree.
 // Draw order: children first, then edges, then this node — so each node's
-// filled rectangle/circle covers the edge endpoints cleanly.
+// filled shape covers the edge endpoints cleanly.
 void drawTree(TreeNode node, pair pos, real hOffset) {
     if (node.isLeaf) {
         drawLeafNode(pos, node.leafClass);
     } else {
         pair leftPos  = pos + (-hOffset, -ySep);
         pair rightPos = pos + ( hOffset, -ySep);
+        pair ext      = nodeExtents(node.label);
+        real leftHH   = node.left.isLeaf  ? treeR : nodeExtents(node.left.label).y;
+        real rightHH  = node.right.isLeaf ? treeR : nodeExtents(node.right.label).y;
 
         drawTree(node.left,  leftPos,  hOffset/2);
         drawTree(node.right, rightPos, hOffset/2);
 
-        drawEdge(pos, leftPos,  node.left.isLeaf,  node.left.edgeLbl,  true);
-        drawEdge(pos, rightPos, node.right.isLeaf, node.right.edgeLbl, false);
+        drawEdge(pos, ext.y, leftPos,  leftHH,  node.left.edgeLbl,  true);
+        drawEdge(pos, ext.y, rightPos, rightHH, node.right.edgeLbl, false);
 
-        drawInternalNode(pos, node.label);
+        drawInternalNode(pos, node.label, ext);
     }
 }
 

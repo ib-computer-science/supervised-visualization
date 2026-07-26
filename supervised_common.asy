@@ -27,14 +27,14 @@ path diamond(pair center, real half) {
         -- (center+(0,-half)) -- (center+(-half,0)) -- cycle;
 }
 
-void drawClass1Point(pair center) {
-    filldraw(circle(center, r), bg, ptborder);
-    label("$1$", center, fg);
+void drawClass1Point(pair center, real radius=r, pen border=ptborder) {
+    filldraw(circle(center, radius), bg, border);
+    label("$1$", center, fg + fontsize(12 * radius/r));
 }
 
-void drawClass2Point(pair center) {
-    filldraw(circle(center, r), fg, ptborder);
-    label("$2$", center, bg);
+void drawClass2Point(pair center, real radius=r, pen border=ptborder) {
+    filldraw(circle(center, radius), fg, border);
+    label("$2$", center, bg + fontsize(12 * radius/r));
 }
 
 void drawQueryPoint(pair center, real half) {
