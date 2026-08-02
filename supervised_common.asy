@@ -18,6 +18,18 @@ real legTextGap   = 0.1;   // gap between legend symbol and text
 pen ptborder = fg + linewidth(1pt);
 pen querypen = fg + linewidth(1.2pt);
 
+// Switch the foreground/background colour scheme (e.g. white-on-black vs
+// black-on-white). Call this immediately after import and before any
+// drawing -- pens derived from fg/bg (ptborder, querypen) are frozen
+// values, not live references, so they must be recomputed here rather
+// than tracking fg/bg automatically.
+void setColorScheme(pen newFg, pen newBg) {
+    fg = newFg;
+    bg = newBg;
+    ptborder = fg + linewidth(1pt);
+    querypen = fg + linewidth(1.2pt);
+}
+
 // --- Shared data
 pair query = (4.8, 3.2);
 
@@ -42,11 +54,11 @@ void drawQueryPoint(pair center, real half) {
     label("$?$", center, fg);
 }
 
-void drawAxes() {
+void drawAxes(string xLabel="$x_1$", string yLabel="$x_2$") {
     draw((0,0)--(axisMax,0), fg, Arrow(6));
     draw((0,0)--(0,yMax), fg, Arrow(6));
-    label("$x_1$", (axisMax, 0), E, fg);
-    label("$x_2$", (0, yMax), N, fg);
+    label(xLabel, (axisMax, 0), E, fg);
+    label(yLabel, (0, yMax), N, fg);
 
     for (int i = 1; i <= xTicks; ++i) {
         draw((i,-tickLen)--(i,tickLen), fg);
@@ -60,19 +72,20 @@ void drawAxes() {
 
 // Draws class 1, class 2, and query point legend entries starting at `start`.
 // Returns the position of the next legend slot below.
-pair drawBaseLegend(pair start) {
+pair drawBaseLegend(pair start, string class1Label="class 1",
+                     string class2Label="class 2", string queryLabel="query point") {
     real legDiamondHalf = r * diamondScale;
     pair leg2pos = start + (0, -legStep);
     pair leg3pos = leg2pos + (0, -legStep);
 
     drawClass1Point(start);
-    label("class 1", start + (r + legTextGap, 0), E, fg);
+    label(class1Label, start + (r + legTextGap, 0), E, fg);
 
     drawClass2Point(leg2pos);
-    label("class 2", leg2pos + (r + legTextGap, 0), E, fg);
+    label(class2Label, leg2pos + (r + legTextGap, 0), E, fg);
 
     drawQueryPoint(leg3pos, legDiamondHalf);
-    label("query point", leg3pos + (legDiamondHalf + legTextGap, 0), E, fg);
+    label(queryLabel, leg3pos + (legDiamondHalf + legTextGap, 0), E, fg);
 
     return leg3pos + (0, -legStep);
 }

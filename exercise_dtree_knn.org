@@ -1,0 +1,181 @@
+#+TITLE: Exercise: Decision Trees and k-Nearest Neighbours
+#+OPTIONS: toc:nil num:nil
+
+* Scenario
+
+A tutoring centre keeps records of students who sat a certification
+exam. For each student it recorded two whole numbers:
+
+- $x_1$ — hours studied during the week before the exam (rounded to
+  the nearest hour)
+- $x_2$ — number of full practice exams completed
+
+Each student is labelled with the outcome:
+
+- *1 (failed)* — drawn as an open circle labelled "1"
+- *2 (passed)* — drawn as a filled circle labelled "2"
+
+A new candidate has just registered. They studied *4 hours* and
+completed *3 practice exams* ($x_1 = 4$, $x_2 = 3$). This candidate
+is marked with a diamond ("?") on the scatter plot below. Your job
+is to predict, using two different methods, whether this candidate
+will pass or fail.
+
+No calculator is needed anywhere in this exercise: the scatter plot
+is drawn on a grid with the same scale on both axes, so every
+point's coordinates can be read off directly, and distances between
+grid points can be compared by eye or with simple whole-number
+arithmetic.
+
+* Part A — k-Nearest Neighbours
+
+Figure [[fig-scatter]] shows the training data and the new candidate.
+
+#+CAPTION: Training data and the candidate to classify.
+#+NAME: fig-scatter
+[[./exercise_scatter.pdf]]
+
+1. Read the coordinates of the candidate and of every training point
+   directly off the grid, then find the three training points closest
+   to the candidate $(4, 3)$. (You do not need a calculator: you can
+   compare distances visually on the grid, or compute
+   $\sqrt{(\Delta x_1)^2 + (\Delta x_2)^2}$ using only whole-number
+   squares and sums — since square root preserves order, you don't
+   even need to take the square root to *rank* the distances.)
+2. List those three nearest neighbours together with their labels
+   (1 = failed, 2 = passed).
+3. Using $k = 3$ and majority vote, what does k-NN predict for the
+   candidate?
+4. Now suppose we used $k = 1$ instead. Does the prediction change?
+   Explain why k-NN predictions can be sensitive to the choice of $k$.
+
+* Part B — Decision Tree
+
+A decision tree was trained on the same data. It is shown in Figure
+[[fig-tree]].
+
+#+CAPTION: Decision tree trained on the same data.
+#+NAME: fig-tree
+[[./exercise_tree.pdf]]
+
+1. Starting at the root, trace the path the candidate
+   ($x_1 = 4$, $x_2 = 3$) takes through the tree. At each
+   internal node, write down whether the answer is "yes" or "no".
+2. Which leaf does the candidate end up in, and what class does the
+   tree predict?
+3. Every leaf contains training points of *both* classes, yet each
+   leaf still predicts a single class. Which class does a leaf
+   predict when its training points are mixed, and why?
+4. This tree has only *three* leaves. On the $x_1 \geq 5$ side, the
+   tree does not split on $x_2$ at all, unlike on the $x_1 < 5$
+   side. Using Figure [[fig-scatter]], explain why splitting the
+   $x_1 \geq 5$ students further by practice exams would not help
+   separate failed from passed students there.
+
+* Part C — Comparing the two methods
+
+1. Do k-NN (with $k=3$) and the decision tree agree on the
+   candidate's predicted outcome? If not, suggest a reason why two
+   reasonable methods can disagree on the same point.
+2. Decision boundaries produced by this decision tree are made of
+   straight horizontal and vertical segments. Looking at the scatter
+   plot, is a boundary made only of horizontal/vertical lines a good
+   fit for separating the two classes? Why or why not?
+3. Unlike the decision tree, k-NN does not build an explicit model
+   from the training data before making a prediction. What has to be
+   stored, and what has to be computed, every time a new candidate is
+   classified?
+4. Name one advantage and one disadvantage of k-NN compared to a
+   decision tree for this dataset.
+
+* Solutions
+
+** Part A
+
+The three closest training points to $(4, 3)$, found by counting
+grid squares (or comparing $(\Delta x_1)^2+(\Delta x_2)^2$, which
+needs no square roots to rank):
+
+| Point   | $\Delta x_1$ | $\Delta x_2$ | Squared distance | Distance | Label |
+|---------+--------------+--------------+-------------------+----------+----------|
+| $(4,2)$ |            0 |            1 |                 1 |        1 | 1 (fail) |
+| $(6,3)$ |            2 |            0 |                 4 |        2 | 2 (pass) |
+| $(2,4)$ |            2 |            1 |                 5 | $\approx 2.24$ | 2 (pass) |
+
+The next-closest point, $(4,6)$, has squared distance $0^2+3^2=9$
+(distance $3$) — clearly farther than the three points above, so
+there's no ambiguity about which three are nearest.
+
+With $k=3$: two neighbours are "passed", one is "failed", so k-NN
+predicts *pass*.
+
+With $k=1$: the single nearest neighbour is $(4, 2)$, labelled
+"failed", so the prediction flips to *fail*. This illustrates that
+small $k$ makes k-NN sensitive to individual (possibly noisy)
+points, while larger $k$ smooths the prediction by averaging over a
+bigger neighbourhood — at the cost of possibly including less
+relevant, more distant points.
+
+** Part B
+
+Path: $x_1 = 4 < 5$ → "yes" (go left); $x_2 = 3 < 3.5$ → "yes"
+(go left). The candidate lands in the leftmost leaf, which predicts
+*1 (fail)*.
+
+That leaf is "pure enough" to be built from mostly class-1 points
+(3 failed vs. 1 passed in the training data, see the lower-left
+region of the scatter plot); a leaf predicts whichever class is the
+*majority* among the training points that fall into it, even if a
+few points of the other class are also present. Those minority
+points are simply misclassified by the tree. The same is true of
+the other two leaves — each is dominated by one class but contains
+one or two points of the other.
+
+Among the $x_1 \geq 5$ students, both the low-practice ones ($x_2 <
+5$: one failed, two passed) and the high-practice ones ($x_2 \geq
+5$: one failed, two passed) are already *pass*-majority. Splitting
+on $x_2$ there would just divide the passing students into two
+groups that are *still both pass-majority* — it wouldn't isolate any
+additional failed students, so it doesn't make the tree any more
+accurate. A tree only introduces a split when it actually separates
+the classes better; here, once $x_1 \geq 5$, practice-exam count
+stops being useful for predicting the outcome, so a well-built tree
+leaves that side as a single leaf.
+
+** Part C
+
+1. No — k-NN ($k=3$) predicts *pass*, while the decision tree
+   predicts *fail*. They disagree because the candidate lies close
+   to two of the tree's splits at once ($x_1 = 4$ is only $1$ away
+   from the split at $x_1 = 5$, and $x_2 = 3$ is only $0.5$ away from
+   the split at $x_2 = 3.5$), and both of the regions just across
+   those splits are pass-majority: a small, essentially arbitrary
+   sliver of training data sends the tree one way, while k-NN instead
+   looks at whichever labelled points happen to be geometrically
+   closest, and two of the three closest happen to be "passed".
+2. Here the fit is actually good, in the sense that matters: the
+   region where *fail* is the more common outcome is exactly the
+   bottom-left rectangle (low hours *and* low practice, $x_1 < 5$ and
+   $x_2 < 3.5$) — everywhere else, *pass* is the majority, even though
+   a few individual failed (and passed) students appear scattered
+   outside their region's majority as noise. Because that
+   majority-outcome boundary is itself an $\text{AND}$ of two
+   axis-aligned conditions, a tree built from horizontal/vertical
+   splits can match it exactly; the scattered noise points are
+   exceptions that no boundary shape could capture anyway. That would
+   not be true of every dataset: if passing instead depended on, say,
+   $x_1 + x_2$ exceeding some diagonal threshold, no finite set of
+   horizontal/vertical splits could match that boundary exactly — it
+   could only be approximated by a "staircase" of small rectangles.
+3. k-NN is a "lazy" method: it stores the entire training set and
+   does no work until a new point arrives, at which point it must
+   compute the distance from the query to every stored training
+   point (or use an index structure) and pick the $k$ smallest.
+4. Advantage of k-NN: it makes no assumption about the shape of the
+   boundary between classes — it would work just as well if the true
+   rule were diagonal or curved, where axis-aligned splits could only
+   approximate it. Disadvantage: it must keep all training data around
+   and recompute distances for every new prediction, which is slower
+   at prediction time than descending a small, precomputed tree —
+   here, and in general, whenever the true rule genuinely does align
+   with the axes, a small tree is both cheaper and no less accurate.
