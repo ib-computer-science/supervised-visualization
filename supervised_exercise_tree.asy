@@ -92,7 +92,7 @@ void drawTree(TreeNode node, pair pos, real hOffset) {
     }
 }
 
-// --- Tree definition (matches the leaf regions in exercise_scatter.asy)
+// --- Tree definition (matches the leaf regions in supervised_exercise_scatter.asy)
 // Note this tree has only 3 leaves, not 4: on the x1>=5 side, practice
 // exams no longer separate the classes (both x2<5 and x2>=5 are
 // pass-majority there), so a real tree-growing algorithm would not

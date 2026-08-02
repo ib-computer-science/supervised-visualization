@@ -33,7 +33,7 @@ Figure [[fig-scatter]] shows the training data and the new candidate.
 
 #+CAPTION: Training data and the candidate to classify.
 #+NAME: fig-scatter
-[[./exercise_scatter.pdf]]
+[[./supervised_exercise_scatter.pdf]]
 
 1. Read the coordinates of the candidate and of every training point
    directly off the grid, then find the three training points closest
@@ -56,7 +56,7 @@ A decision tree was trained on the same data. It is shown in Figure
 
 #+CAPTION: Decision tree trained on the same data.
 #+NAME: fig-tree
-[[./exercise_tree.pdf]]
+[[./supervised_exercise_tree.pdf]]
 
 1. Starting at the root, trace the path the candidate
    ($x_1 = 4$, $x_2 = 3$) takes through the tree. At each
